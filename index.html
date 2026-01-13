@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPT Connections - File Sharing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a192f;
+            color: #e6f1ff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background image with overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #64ffda;
+            margin-bottom: 40px;
+            background-color: rgba(10, 25, 47, 0.85);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #64ffda;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ccd6f6;
+            margin-bottom: 20px;
+        }
+
+        .creator {
+            color: #8892b0;
+            font-style: italic;
+            font-size: 1rem;
+        }
+
+        .software-name {
+            color: #64ffda;
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .upload-section, .files-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: rgba(10, 25, 47, 0.9);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #64ffda;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #233554;
+        }
+
+        .upload-area {
+            border: 3px dashed #64ffda;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            background-color: rgba(100, 255, 218, 0.05);
+        }
+
+        .upload-area:hover {
+            background-color: rgba(100, 255, 218, 0.1);
+        }
+
+        .upload-area i {
+            font-size: 4rem;
+            color: #64ffda;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .file-size-note {
+            font-size: 0.9rem;
+            color: #8892b0;
+            margin-top: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background-color: #64ffda;
+            color: #0a192f;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        .upload-btn:hover {
+            background-color: #52d1b2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        .file-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: rgba(35, 53, 84, 0.5);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .file-item:hover {
+            background-color: rgba(35, 53, 84, 0.8);
+            transform: translateX(5px);
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        .audio-icon {
+            background-color: rgba(86, 207, 225, 0.2);
+            color: #56cfe1;
+        }
+
+        .video-icon {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .image-icon {
+            background-color: rgba(100, 255, 218, 0.2);
+            color: #64ffda;
+        }
+
+        .file-icon {
+            background-color: rgba(200, 200, 255, 0.2);
+            color: #c8c8ff;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #e6f1ff;
+        }
+
+        .file-size {
+            color: #8892b0;
+            font-size: 0.9rem;
+        }
+
+        .download-btn {
+            background-color: #0a192f;
+            color: #64ffda;
+            border: 1px solid #64ffda;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .download-btn:hover {
+            background-color: #64ffda;
+            color: #0a192f;
+        }
+
+        .upload-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-success {
+            background-color: rgba(100, 255, 218, 0.1);
+            border-left: 4px solid #64ffda;
+            display: block;
+        }
+
+        .status-error {
+            background-color: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            display: block;
+        }
+
+        .status-text {
+            color: #e6f1ff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #233554;
+            margin-top: 30px;
+            color: #8892b0;
+            font-size: 0.9rem;
+            background-color: rgba(10, 25, 47, 0.85);
+            border-radius: 10px;
+        }
+
+        .instructions {
+            background-color: rgba(35, 53, 84, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .instructions h3 {
+            color: #64ffda;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+            color: #ccd6f6;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        /* Scrollbar styling */
+        .file-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .file-list::-webkit-scrollbar-track {
+            background: rgba(35, 53, 84, 0.3);
+            border-radius: 10px;
+        }
+
+        .file-list::-webkit-scrollbar-thumb {
+            background: #64ffda;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CPT Connections</h1>
+            <div class="subtitle">File Sharing Software - Upload and Download Files up to 1GB</div>
+            <div class="creator">Made by Akachukwu Franklin Munachimso</div>
+        </header>
+
+        <div class="main-content">
+            <section class="upload-section">
+                <h2 class="section-title">Upload Files</h2>
+                <div class="upload-area" id="dropArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <div class="upload-text">Drag and drop files here or click to browse</div>
+                    <div class="file-size-note">Supports files up to 1GB (images, audio, video, documents)</div>
+                    <input type="file" class="file-input" id="fileInput" multiple>
+                    <label for="fileInput" class="upload-btn">Choose Files</label>
+                </div>
+                
+                <div class="upload-status" id="uploadStatus"></div>
+                
+                <div class="instructions">
+                    <h3>How to use CPT Connections:</h3>
+                    <ul>
+                        <li>Click "Choose Files" or drag files to the upload area</li>
+                        <li>Supported file types: images (JPG, PNG, GIF), audio (MP3, WAV), video (MP4, AVI), documents (PDF, DOC)</li>
+                        <li>Files up to 1GB in size can be uploaded</li>
+                        <li>Uploaded files are saved and available for download</li>
+                        <li>When deployed to GitHub, others can download your uploaded files</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="files-section">
+                <h2 class="section-title">Uploaded Files</h2>
+                <div class="file-list" id="fileList">
+                    <!-- Files will be dynamically added here -->
+                    <div class="file-item">
+                        <div class="file-icon audio-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">Sample Audio.mp3</div>
+                            <div class="file-size">15.2 MB</div>
+                        </div>
+                        <button class="download-btn">Download</button>
+                    </div>
+                    
+                    <div class="file-item">
+                        <div class="file-icon video-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">Demo Video.mp4</div>
+                            <div class="file-size">245.7 MB</div>
+                        </div>
+                        <button class="download-btn">Download</button>
+                    </div>
+                    
+                    <div class="file-item">
+                        <div class="file-icon image-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">Example Image.jpg</div>
+                            <div class="file-size">3.8 MB</div>
+                        </div>
+                        <button class="download-btn">Download</button>
+                    </div>
+                    
+                    <div class="file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">Document.pdf</div>
+                            <div class="file-size">8.1 MB</div>
+                        </div>
+                        <button class="download-btn">Download</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>CPT Connections File Sharing Software | Made by Akachukwu Franklin Munachimso</p>
+            <p>Note: This is a frontend demonstration. For a production environment, a backend server with proper file storage is required.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Sample file data
+        const sampleFiles = [
+            { name: "Sample Audio.mp3", size: "15.2 MB", type: "audio" },
+            { name: "Demo Video.mp4", size: "245.7 MB", type: "video" },
+            { name: "Example Image.jpg", size: "3.8 MB", type: "image" },
+            { name: "Document.pdf", size: "8.1 MB", type: "file" }
+        ];
+
+        // Initialize with sample files
+        document.addEventListener('DOMContentLoaded', function() {
+            // Files are already hardcoded in HTML for demonstration
+        });
+
+        // Handle file selection
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Handle drag and drop
+        const dropArea = document.getElementById('dropArea');
+        
+        dropArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropArea.style.borderColor = '#52d1b2';
+            dropArea.style.backgroundColor = 'rgba(100, 255, 218, 0.15)';
+        });
+        
+        dropArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            dropArea.style.borderColor = '#64ffda';
+            dropArea.style.backgroundColor = 'rgba(100, 255, 218, 0.05)';
+        });
+        
+        dropArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropArea.style.borderColor = '#64ffda';
+            dropArea.style.backgroundColor = 'rgba(100, 255, 218, 0.05)';
+            
+            if (e.dataTransfer.files.length) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        // Handle file upload and display
+        function handleFiles(files) {
+            const uploadStatus = document.getElementById('uploadStatus');
+            
+            // Clear previous status
+            uploadStatus.className = 'upload-status';
+            uploadStatus.innerHTML = '';
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                
+                // Check file size (1GB = 1073741824 bytes)
+                if (file.size > 1073741824) {
+                    uploadStatus.className = 'upload-status status-error';
+                    uploadStatus.innerHTML = `<div class="status-text">Error: "${file.name}" exceeds the 1GB size limit.</div>`;
+                    continue;
+                }
+                
+                // Create file item for the uploaded file
+                addFileToList(file);
+                
+                // Show success message
+                uploadStatus.className = 'upload-status status-success';
+                uploadStatus.innerHTML = `<div class="status-text">Successfully uploaded "${file.name}" (${formatFileSize(file.size)})</div>`;
+            }
+            
+            // Clear file input
+            document.getElementById('fileInput').value = '';
+        }
+
+        // Add file to the list
+        function addFileToList(file) {
+            const fileList = document.getElementById('fileList');
+            
+            // Determine file type for icon
+            let fileType = 'file';
+            let iconClass = 'fas fa-file';
+            
+            if (file.type.startsWith('audio/')) {
+                fileType = 'audio';
+                iconClass = 'fas fa-music';
+            } else if (file.type.startsWith('video/')) {
+                fileType = 'video';
+                iconClass = 'fas fa-video';
+            } else if (file.type.startsWith('image/')) {
+                fileType = 'image';
+                iconClass = 'fas fa-image';
+            }
+            
+            // Create file item
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            
+            fileItem.innerHTML = `
+                <div class="file-icon ${fileType}-icon">
+                    <i class="${iconClass}"></i>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${formatFileSize(file.size)}</div>
+                </div>
+                <button class="download-btn" onclick="downloadFile('${file.name}', ${file.size})">Download</button>
+            `;
+            
+            // Add to the beginning of the list
+            fileList.insertBefore(fileItem, fileList.firstChild);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Download file function
+        function downloadFile(fileName, fileSize) {
+            // In a real application, this would request the file from a server
+            // For this demo, we'll simulate a download with a blob
+            
+            // Create a simple text file with file info for demonstration
+            const fileContent = `This is a demo file representing "${fileName}".\n\n` +
+                              `In a real implementation, this would be the actual file content.\n` +
+                              `File size: ${formatFileSize(fileSize)}\n` +
+                              `Uploaded to CPT Connections by Akachukwu Franklin Munachimso\n` +
+                              `Downloaded on: ${new Date().toLocaleDateString()}`;
+            
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Show download notification
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadStatus.className = 'upload-status status-success';
+            uploadStatus.innerHTML = `<div class="status-text">Downloading "${fileName}"...</div>`;
+            
+            // Clear the status after 3 seconds
+            setTimeout(() => {
+                uploadStatus.className = 'upload-status';
+                uploadStatus.innerHTML = '';
+            }, 3000);
+        }
+
+        // Make the upload area clickable
+        dropArea.addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+    </script>
+</body>
+</html>
